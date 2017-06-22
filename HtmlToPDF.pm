@@ -271,7 +271,7 @@ sub read_config
         'PDFConvertCommand' => RT->Config->Get('PDFConvertCommand') // 'xvfb-run wkhtmltopdf',
         'PDFConvertCommandOptions' => RT->Config->Get('PDFConvertCommandOptions') // {},
         'PDFHTMLDebug' => RT->Config->Get('PDFHTMLDebug') // 0,
-        'PDFCommentMsg' => RT->Config->Get('PDFHTMLDebug') // '',
+        'PDFCommentMsg' => RT->Config->Get('PDFCommentMsg') // '',
     );
     return (undef) if (scalar(grep { ! defined $_ } values %conf));
     return (undef) if (ref($conf{'PDFConvertCommandOptions'}) ne 'HASH');
