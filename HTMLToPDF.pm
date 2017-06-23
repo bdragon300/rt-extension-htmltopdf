@@ -156,15 +156,16 @@ sub Commit
         RT::Logger->debug("[RT::Action::HTMLToPDF]: HTML contents: $tpl_str");
     }
 
-    my ($pdf_fh, $pdf_fn) = File::Temp->new(
+    my $pdf_fh = File::Temp->new(
         SUFFIX => '.pdf',
         UNLINK => 1
     );
+    my $pdf_fn = $pdf_fh->filename;
 
     my @cmd = ('xvfb-run', 'wkhtmltopdf');
-    push @cmd, grep{ defined } @{%{$config->{'PDFConvertCommandOptions'}}});
+    push @cmd, grep{ defined } %{$config->{'PDFConvertCommandOptions'}};
     push @cmd, ('-', $pdf_fn);
-    RT::Logger->info('[RT::Action::HTMLToPDF]: Executing ' . join(' ', @cmd));
+    RT::Logger->info('[RT::Action::HTMLToPDF]: Executing "' . join(' ', @cmd) . '"');
 
     my $pid = open(my $cmd_fh, '|-', @cmd);
     unless ($pid) {
@@ -174,6 +175,8 @@ sub Commit
         $self->record_error_txn();
         return 0;
     }
+    print $cmd_fh $tpl_str;
+    close $cmd_fh;
 
     # Build comment MIME object
     my $comment_obj = MIME::Entity->build(
