@@ -146,8 +146,10 @@ sub Commit
     $self->{'tpl_headers'} = $self->{'config'} = undef;
 
     # Filename pattern
+    my $date = `date +"%d-%m-%Y_%H:%M"`;
+    chomp $date;
     my $fn_prefix = $tpl_headers->{'X-Filename-Prefix'};
-    my $fn = $fn_prefix . `date +"%d-%m-%Y_%H:%M"` . '.pdf';
+    my $fn = $fn_prefix . $date . '.pdf';
 
     # Retrieve our template parsed contents
     my $tpl_str = $self->TemplateObj->MIMEObj->bodyhandle->as_string;
