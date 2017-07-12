@@ -203,7 +203,8 @@ sub Commit
         RT::Logger->error("[RT::Action::HTMLToPDF]: Unable to create Comment transaction: $msg");
         return 0;
     }
-    RT::Logger->info("[RT::Action::HTMLToPDF]: Create PDF successful: $fn in txn #$txnid");
+    my $tickid = $self->TicketObj->id;
+    RT::Logger->info("[RT::Action::HTMLToPDF]: Create PDF successful: $fn in txn #$txnid ticket #$tickid");
 
     return 1;
 }
