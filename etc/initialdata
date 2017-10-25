@@ -1,0 +1,12 @@
+use strict;
+use warnings;
+
+our @ScripActions = (
+{
+    Name => 'HTMLToPDF',
+    Description => 'Generate PDF from HTML and attach it to a ticket',
+    ExecModule => 'HTMLToPDF'
+}
+);
+
+1;

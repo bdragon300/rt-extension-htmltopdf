@@ -13,7 +13,7 @@ use warnings;
 
 =head1 NAME
 
-RT::Action::HTMLToPDF - Convert HTML to PDF based on standard RT template.
+RT::Action::HTMLToPDF - Generate PDF from HTML and attach it to a ticket
 
 =head1 DESCRIPTION
 
@@ -25,60 +25,6 @@ datetime. You can set prefix in template header X-Filename-Prefix, e.g.
 X-Filename-Prefix: Invoice_. If header has omitted then no prefix will be used.
 
 =cut
-
-=head1 INSTALLATION
-
-Dependencies:
-
-=over
-
-=item * wkhtmltopdf
-
-=item * xvfb
-
-=back
-
-Install dependencies. In Debian you can do:
-
-C<apt-get install wkhtmltopdf xvfb>
-
-Then copy this Action to RT's Action directory, usually 'lib/RT/Action'. Then
-inform RT about this Action:
-    
-C<INSERT INTO scripactions (
-    name, description, execmodule, creator, created, lastupdatedby, lastupdated) 
-    VALUES ('HTMLToPDF', 'Convert HTML to PDF based on standard RT template.', 
-    'HTMLToPDF', 1, now(), 1, now());>
-
-=head1 CONFIGURATION
-
-    # See wkhtmltopdf manpage for options list
-    Set($PDFConvertCommandOptions, { # Optional. Default is no options
-        '--encoding' => 'utf-8',
-        '--zoom' => '1.1',
-        '--margin-top' => '4',
-        '--no-images' => undef, # Used as flag
-        '-n' => undef           # Used as flag
-    });
-    Set($PDFConvertCommand, 'xvfb-run wkhtmltopdf'); # Optional.Default is shown
-    Set($PDFCommentMsg, 'Comment message');  # Optional.Default is empty message
-    Set($PDFHTMLDebug, 1);  # Optional. Print generated template html to the 
-      debug log. Default is 0.
-
-=cut
-
-
-=head1 TEMPLATE EXAMPLE
-
-    X-Filename-Prefix: Invoice_
-
-    <html><body>
-    <h1>Hello!</h1>
-    <p>Hello, from the ticket #{$Ticket->id}!</p>
-    </body></html>
-
-Above HTML will be converted to file with name 'Invoice_22-06-2017 17:41.pdf'
-and comment will be written with such file as attachment.
 
 
 =head1 VARIABLES
