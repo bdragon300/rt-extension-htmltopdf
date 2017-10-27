@@ -56,11 +56,11 @@ sub Prepare
     # Read config
     $self->{'config'} = $self->read_config;
     unless ($self->{'config'}) {
-        RT::Logger->error('[RT::Action::HTMLToPDF]: Incomplete config in SiteConfig, see README');
+        RT::Logger->error('[RT::Extension::HTMLToPDF]: Incomplete config in SiteConfig, see README');
         return 0;
     }
     unless ($self->TemplateObj) {
-        RT::Logger->error('[RT::Action::HTMLToPDF]: No template passed. Abort.');
+        RT::Logger->error('[RT::Extension::HTMLToPDF]: No template passed. Abort.');
         return 0;
     }
     $self->TemplateObj->Parse(
@@ -101,7 +101,7 @@ sub Commit
     my $tpl_str = $self->TemplateObj->MIMEObj->bodyhandle->as_string;
 
     if ($config->{'PDFHTMLDebug'}) {
-        RT::Logger->debug("[RT::Action::HTMLToPDF]: HTML contents: $tpl_str");
+        RT::Logger->debug("[RT::Extension::HTMLToPDF]: HTML contents: $tpl_str");
     }
 
     my $pdf_fh = File::Temp->new(
@@ -113,12 +113,12 @@ sub Commit
     my @cmd = ('xvfb-run', 'wkhtmltopdf');
     push @cmd, grep{ defined } %{$config->{'PDFConvertCommandOptions'}};
     push @cmd, ('-', $pdf_fn);
-    RT::Logger->info('[RT::Action::HTMLToPDF]: Executing "' . join(' ', @cmd) . '"');
+    RT::Logger->info('[RT::Extension::HTMLToPDF]: Executing "' . join(' ', @cmd) . '"');
 
     my $pid = open(my $cmd_fh, '|-', @cmd);
     unless ($pid) {
         RT::Logger->error(
-            "[RT::Action::HTMLToPDF]: Error execute pdf convert command: $! [PATH=$ENV{PATH}]"
+            "[RT::Extension::HTMLToPDF]: Error execute pdf convert command: $! [PATH=$ENV{PATH}]"
         );
         $self->record_error_txn();
         return 0;
@@ -148,11 +148,11 @@ sub Commit
 
     my ($txnid, $msg, $txn) = $self->TicketObj->Comment(MIMEObj => $comment_obj);
     unless ($txnid) {
-        RT::Logger->error("[RT::Action::HTMLToPDF]: Unable to create Comment transaction: $msg");
+        RT::Logger->error("[RT::Extension::HTMLToPDF]: Unable to create Comment transaction: $msg");
         return 0;
     }
     my $tickid = $self->TicketObj->id;
-    RT::Logger->info("[RT::Action::HTMLToPDF]: Create PDF successful: $fn in txn #$txnid ticket #$tickid");
+    RT::Logger->info("[RT::Extension::HTMLToPDF]: Create PDF successful: $fn in txn #$txnid ticket #$tickid");
 
     return 1;
 }
@@ -193,7 +193,7 @@ sub record_error_txn {
     );
 
     unless ($id) {
-        $RT::Logger->warning("[RT::Action::HTMLToPDF]: Could not record error transaction: $msg");
+        $RT::Logger->warning("[RT::Extension::HTMLToPDF]: Could not record error transaction: $msg");
     }
     return $id;
 }
