@@ -12,46 +12,46 @@ tool. Generated document attaches to a ticket.
 # Dependencies
 
 * RT >= 4.0.0
-* Config::Crontab >= 1.33
+* MIME::Entity
 * wkhtmltopdf, xvfb tools
 
 
 # Installation
 
-Firstly, install wkhtmltopdf, xvfb utilities.
+1. Firstly, install wkhtmltopdf, xvfb utilities:
 
-* On Debian: `apt-get install wkhtmltopdf xvfb`
+	* On Debian: `apt-get install wkhtmltopdf xvfb`
 
-* On Centos, RedHat: `yum install wkhtmltox xorg-x11-server-Xvfb`
+	* On Centos, RedHat: `yum install wkhtmltox xorg-x11-server-Xvfb`
 
-**NOTE:** probably you will need to install additional font packages.
+	**NOTE:** probably you will need to install additional font packages.
 
-Next, do following (May need root permissions):
+2. Next, do following (May need root permissions):
 
-`$ perl Makefile.PL && make && make install`
+	`$ perl Makefile.PL && make && make install`
 
-Then, insert extension data into RT database:
+3. Then, insert extension data into RT database:
 
-`$ make initdb`
+	`$ make initdb`
 
-Be careful, run the last command one time only, otherwise you can get duplicates
-in the database.
+	Be careful, run the last command one time only, otherwise you can get duplicates
+	in the database.
 
-Finally, let RT to get to know about the extension. write in *RT_SiteConfig.pm* following:
+4. Finally, let RT to get to know about the extension. Write in *RT_SiteConfig.pm* following:
 
-For RT>=4.2:
+	For RT>=4.2:
 
-```
-Plugin( "RT::Extension::WebCrontab" );
-```
+	```
+	Plugin( "RT::Extension::HTMLToPDF" );
+	```
 
-For RT<4.2:
+	For RT<4.2:
 
-```
-Set(@Plugins, qw(RT::Extension::WebCrontab));
-```
+	```
+	Set(@Plugins, qw(RT::Extension::HTMLToPDF));
+	```
 
-After installing you may need to restart webserver.
+	After installing you may need to restart webserver.
 
 
 # Quick example
