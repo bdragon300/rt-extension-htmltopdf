@@ -58,6 +58,7 @@ tool. Generated document attaches to a ticket.
 
 ```
 X-Filename-Prefix: Invoice_
+X-Message-Contents: Generated file linked as message attachment, ticket #{$Ticket->id}
 
 <html><body>
 <h1>Hello!</h1>
@@ -83,6 +84,15 @@ X-Filename-Prefix: Invoice_
 
 In this example the file will be named as "Invoice_22-06-2017 17:41.pdf".
 
+### X-Message-Contents
+
+Optional. If present then specified text will appear in comment.
+
+Default is no message.
+
+```
+X-Message-Contents: This text will appear in message contents
+```
 
 # Configuration
 
@@ -113,16 +123,6 @@ Default is shown below.
 
 ```
 Set($PDFConvertCommand, 'xvfb-run wkhtmltopdf');
-```
-
-### $PDFCommentMsg
-
-Optional. Message of comment to which a PDF file will be linked as attachment.
-
-Default is empty message.
-
-```
-Set($PDFCommentMsg, 'Comment message');
 ```
 
 ### $PDFHTMLDebug

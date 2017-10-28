@@ -38,7 +38,7 @@ List of available template headers
 
 =cut
 
-my @template_headers = ('X-Filename-Prefix');
+my @template_headers = ('X-Filename-Prefix', 'X-Message-Contents');
 
 
 =head1 METHODS
@@ -68,7 +68,7 @@ sub Prepare
         TransactionObj => $self->TransactionObj
     );
 
-    # Retrieve template headers without "\n"
+    # Retrieve template headers without "\n". Empty string if not found
     my %headers = ();
     @headers{@template_headers} = map{ s/\n$//gr } map { $self->TemplateObj->MIMEObj->head->get($_) || '' } @template_headers; #/
 
@@ -135,8 +135,8 @@ sub Commit
     $comment_obj->attach(
         Type => "text/plain",
         Charset => "UTF-8",
-        Data => Encode::encode("UTF-8", $config->{'PDFCommentMsg'})
-    ) if ($config->{'PDFCommentMsg'});
+        Data => Encode::encode("UTF-8", $tpl_headers->{'X-Message-Contents'})
+    ) if ($tpl_headers->{'X-Message-Contents'});
 
     $comment_obj->attach(
         Path => $pdf_fn,
@@ -223,7 +223,6 @@ sub read_config
         'PDFConvertCommand' => RT->Config->Get('PDFConvertCommand') // 'xvfb-run wkhtmltopdf',
         'PDFConvertCommandOptions' => RT->Config->Get('PDFConvertCommandOptions') // {},
         'PDFHTMLDebug' => RT->Config->Get('PDFHTMLDebug') // 0,
-        'PDFCommentMsg' => RT->Config->Get('PDFCommentMsg') // '',
     );
     return (undef) if (scalar(grep { ! defined $_ } values %conf));
     return (undef) if (ref($conf{'PDFConvertCommandOptions'}) ne 'HASH');
