@@ -70,7 +70,7 @@ sub Prepare
 
     # Retrieve template headers without "\n". Empty string if not found
     my %headers = ();
-    @headers{@template_headers} = map{ s/\n$//gr } map { $self->TemplateObj->MIMEObj->head->get($_) || '' } @template_headers; #/
+    @headers{@template_headers} = map{ s/[\n\r]$//gr } map { $self->TemplateObj->MIMEObj->head->get($_) || '' } @template_headers; #/
 
     $self->{'tpl_headers'} = \%headers;
 
