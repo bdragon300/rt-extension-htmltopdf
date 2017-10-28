@@ -18,11 +18,7 @@ RT::Action::HTMLToPDF - Generate PDF from HTML and attach it to a ticket
 =head1 DESCRIPTION
 
 This action creates PDF document based on given HTML document and attaches it to
- the ticket as comment. HTML retrieved from RT template selected in Scrip
-
-Generated file name will contain optional prefix concatenated with current 
-datetime. You can set prefix in template header X-Filename-Prefix, e.g. 
-X-Filename-Prefix: Invoice_. If header has omitted then no prefix will be used.
+ a ticket. HTML retrieved from RT template selected in Scrip.
 
 =cut
 
@@ -38,7 +34,7 @@ List of available template headers
 
 =cut
 
-my @template_headers = ('X-Filename-Prefix', 'X-Message-Contents');
+my @template_headers = qw/X-Filename-Prefix X-Message-Contents X-Message-Type/;
 
 
 =head1 METHODS
@@ -126,19 +122,21 @@ sub Commit
     print $cmd_fh $tpl_str;
     close $cmd_fh;
 
-    # Build comment MIME object
-    my $comment_obj = MIME::Entity->build(
+    # Build MIME object
+    my $mime_obj = MIME::Entity->build(
         Type => "multipart/mixed",
         Charset => "UTF-8"
     );
 
-    $comment_obj->attach(
+    my $msg_contents = $tpl_headers->{'X-Message-Contents'};
+    utf8::decode($msg_contents) unless utf8::is_utf8($msg_contents);
+    $mime_obj->attach(
         Type => "text/plain",
         Charset => "UTF-8",
-        Data => Encode::encode("UTF-8", $tpl_headers->{'X-Message-Contents'})
-    ) if ($tpl_headers->{'X-Message-Contents'});
+        Data => Encode::encode("UTF-8", $msg_contents)
+    ) if ($msg_contents);
 
-    $comment_obj->attach(
+    $mime_obj->attach(
         Path => $pdf_fn,
         Type => 'application/pdf',
         Filename => $fn,
@@ -146,11 +144,27 @@ sub Commit
         # Data => $pdf_str
     );
 
-    my ($txnid, $msg, $txn) = $self->TicketObj->Comment(MIMEObj => $comment_obj);
+    # Write message txn
+    my $msg_type = lc $tpl_headers->{'X-Message-Type'} || 'comment';
+    if ($msg_type !~ /comment|correspond/) {
+        RT::Logger->warning("[RT::Extension::HTMLToPDF]: Invalid value '$msg_type' in X-Message-Type header. Comment will be written");
+        $msg_type = 'comment';
+    }
+    my ($txnid, $err_msg, $txn);
+    if ($msg_type eq 'correspond') {
+        ($txnid, $err_msg, $txn) = $self->TicketObj->Correspond(
+            MIMEObj => $mime_obj
+        );
+    } elsif ($msg_type eq 'comment') {
+        ($txnid, $err_msg, $txn) = $self->TicketObj->Comment(
+            MIMEObj => $mime_obj
+        );
+    }
     unless ($txnid) {
-        RT::Logger->error("[RT::Extension::HTMLToPDF]: Unable to create Comment transaction: $msg");
+        RT::Logger->error("[RT::Extension::HTMLToPDF]: Unable to create $msg_type transaction: $err_msg");
         return 0;
     }
+    
     my $tickid = $self->TicketObj->id;
     RT::Logger->info("[RT::Extension::HTMLToPDF]: Create PDF successful: $fn in txn #$txnid ticket #$tickid");
 

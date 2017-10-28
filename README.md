@@ -59,6 +59,7 @@ tool. Generated document attaches to a ticket.
 ```
 X-Filename-Prefix: Invoice_
 X-Message-Contents: Generated file linked as message attachment, ticket #{$Ticket->id}
+X-Message-Type: Correspond
 
 <html><body>
 <h1>Hello!</h1>
@@ -86,13 +87,24 @@ In this example the file will be named as "Invoice_22-06-2017 17:41.pdf".
 
 ### X-Message-Contents
 
-Optional. If present then specified text will appear in comment.
+Optional. If present then specified text will appear in message.
 
 Default is no message.
 
 ```
 X-Message-Contents: This text will appear in message contents
 ```
+
+### X-Message-Type
+
+Optional. What type of message will be written in the ticket.
+
+Possible are: Comment, Correspond. Default is Comment.
+
+```
+X-Message-Type: Comment
+```
+
 
 # Configuration
 
